@@ -58,6 +58,7 @@
     import  NavHeader from './../components/NavHeader'
     import  NavBread from './../components/NavBread'
     import  NavFooter from './../components/NavFooter'
+    import  Axios from 'axios'
 
 
 
@@ -66,68 +67,7 @@
         name: "GoodsList2",
         data() {
           return {
-            goodsList:[
-              {
-                "productId":"10001",
-                "productName":"小米空气净化器 2",
-                "salePrice":"699",
-                "productImage":"小米空气净化器 2.jpg"
-              },
-              {
-                "productId":"10002",
-                "productName":"米家空气净化器Pro",
-                "salePrice":"1499",
-                "productImage":"米家空气净化器Pro.jpg"
-              },
-              {
-                "productId":"10003",
-                "productName":"米家PM2.5检测仪",
-                "salePrice":"399",
-                "productImage":"米家PM2.5检测仪.jpg"
-              },
-              {
-                "productId":"10004",
-                "productName":"九号平衡车",
-                "salePrice":"1999",
-                "productImage":"九号平衡车.jpg"
-              },
-              {
-                "productId":"10005",
-                "productName":"小米路由器 3",
-                "salePrice":"139",
-                "productImage":"小米路由器 3.jpg"
-              },
-              {
-                "productId":"10006",
-                "productName":"米家压力 IH 电饭煲",
-                "salePrice":"999",
-                "productImage":"米家压力 IH 电饭煲.jpg"
-              },
-              {
-                "productId":"10007",
-                "productName":"米家IH电饭煲",
-                "salePrice":"399",
-                "productImage":"米家IH电饭煲.jpg"
-              },
-              {
-                "productId":"10008",
-                "productName":"米家恒温电水壶",
-                "salePrice":"199",
-                "productImage":"米家恒温电水壶.jpg"
-              },
-              {
-                "productId":"10009",
-                "productName":"米家小白智能摄像机",
-                "salePrice":"399",
-                "productImage":"米家小白智能摄像机.jpg"
-              },
-              {
-                "productId":"10010",
-                "productName":"Yeelight床头灯",
-                "salePrice":"249",
-                "productImage":"Yeelight床头灯.jpg"
-              }
-            ],
+            goodsList:[],
             priceFilter:[
               {
                 startPrice:'0.00',
@@ -163,7 +103,25 @@
           NavBread,
           NavFooter
         },
+        // mounted:()=>{
+        //   this.a.methods.getGoodsList()//这样可以
+        //   this.test();
+        //   this.getGoodsList();
+        // },
+        mounted() {
+          console.log(this)
+          this.getGoodsList()
+        },
         methods: {
+          getGoodsList() {
+            Axios.get('/goods').then((result)=> {
+              var res = result.data.result;
+              this.goodsList = res.list;
+
+            })
+          },
+          // 注意，不应该使用箭头函数来定义 method 函数 (例如 plus: () => this.a++)。理由是箭头函数绑定了父级作用域的上下文，所以 this 将不会按照期望指向 Vue 实例，this.a 将是 undefined。
+          //同理 mounted也不能用箭头函数
           setPriceFilter(index) {
             console.log("index : "+index)
             this.priceChecked = index;
@@ -175,7 +133,8 @@
           closePop() {
             this.overFlag = false;
           }
-        }
+        },
+
     }
 </script>
 
