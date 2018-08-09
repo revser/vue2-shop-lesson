@@ -7,8 +7,8 @@
         <div class="container">
           <div class="filter-nav">
             <span class="sortby">排序:</span>
-            <a href="javascript:void(0)" class="default cur">默认</a>
-            <a href="javascript:void(0)" class="price">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
+            <a href="javascript:void(0)" class="default cur" @click="sortGoodsDefault()">默认</a>
+            <a href="javascript:void(0)" class="price" v-bind:class="{'sort-up':sortFlag}" @click="sortGoods()">价格 <svg class="icon icon-arrow-short"><use xlink:href="#icon-arrow-short"></use></svg></a>
             <a href="javascript:void(0)" class="filterby" @click.stop="showFilterPop">筛选</a>
           </div>
           <div class="accessory-result">
@@ -68,10 +68,10 @@
         data() {
           return {
             goodsList:[],
-            sortFlag:1,
-            page:1,
-            pageSize:8,
-            priceFilter:[
+            sortFlag: true,
+            page: 1,
+            pageSize: 8,
+            priceFilter: [
               {
                 startPrice:'0.00',
                 endPrice:'100.00'
@@ -120,7 +120,7 @@
             var param = {
               page: this.page,
               pageSize: this.pageSize,
-              sort: this.sortFlag
+              sort: this.sortFlag?1:-1
             }
             Axios.get('http://localhost:3000/goods',{
               params:param
@@ -132,6 +132,18 @@
           },
           // 注意，不应该使用箭头函数来定义 method 函数 (例如 plus: () => this.a++)。理由是箭头函数绑定了父级作用域的上下文，所以 this 将不会按照期望指向 Vue 实例，this.a 将是 undefined。
           //同理 mounted也不能用箭头函数
+
+          sortGoodsDefault() {
+            this.sortFlag = true;
+            this.page = 1;
+            this.getGoodsList();
+          },
+          sortGoods() {
+            this.sortFlag = !this.sortFlag;
+            this.page = 1;
+            this.getGoodsList();
+          },
+
           setPriceFilter(index) {
             console.log("index : "+index)
             this.priceChecked = index;
