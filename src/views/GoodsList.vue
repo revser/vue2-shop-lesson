@@ -114,7 +114,7 @@
         },
         methods: {
           getGoodsList() {
-            Axios.get('/goods').then((result)=> {
+            Axios.get('http://localhost:3000/goods').then((result)=> {
               var res = result.data.result;
               this.goodsList = res.list;
 
