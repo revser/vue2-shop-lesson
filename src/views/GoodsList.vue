@@ -29,7 +29,7 @@
                 <ul>
                   <li v-for="item in goodsList">
                     <div class="pic">
-                      <a href="#"><img v-lazy="'/static/'+item.productImage" alt=""></a>
+                      <a href="#"><img v-lazy="'/static/'+item.productImage" :key="item.productId" alt=""></a>
                     </div>
                     <div class="main">
                       <div class="name">{{item.productName}}</div>
@@ -41,6 +41,13 @@
                   </li>
                 </ul>
               </div>
+              <!--vue-infinete-scroll插件-->
+               <div class="view-more-normal"
+                 v-infinite-scroll="loadMore"
+                 infinite-scroll-disabled="busy"
+                 infinite-scroll-distance=20>
+                 <img src="./../../static/loading-svg/loading-spinning-bubbles.svg" v-show="loading">
+               </div>
             </div>
           </div>
         </div>
@@ -71,6 +78,8 @@
             sortFlag: true,
             page: 1,
             pageSize: 8,
+            busy:true,
+            loading:false,
             priceFilter: [
               {
                 startPrice:'0.00',
@@ -116,17 +125,35 @@
           this.getGoodsList()
         },
         methods: {
-          getGoodsList() {
+          getGoodsList(flag) {
             var param = {
               page: this.page,
               pageSize: this.pageSize,
-              sort: this.sortFlag?1:-1
+              sort: this.sortFlag?1:-1,
+              priceLevel: this.priceChecked
             }
+            this.loading =  true;
             Axios.get('http://localhost:3000/goods',{
               params:param
             }).then((result)=> {
-              var res = result.data.result;
-              this.goodsList = res.list;
+              var res = result.data;
+              this.loading = false;
+              if(res.status == "0"){
+                if(flag) {
+                  this.goodsList = this.goodsList.concat(res.result.list);
+                  console.log(res);
+                  if(res.result.count == 0){
+                    this.busy = true;
+                  }else{
+                    this.busy = false;
+                  }
+                }else {
+                  this.goodsList = res.result.list;
+                  this.busy = false;
+                }
+              }else {
+                 this.goodsList = [];
+              }
 
             })
           },
@@ -143,10 +170,18 @@
             this.page = 1;
             this.getGoodsList();
           },
-
+          loadMore() {
+            this.busy = true;//这有什么用 滚动不可生效
+            setTimeout(()=>{
+              this.page++;
+              this.getGoodsList(true);
+            },500)
+          },
           setPriceFilter(index) {
             console.log("index : "+index)
             this.priceChecked = index;
+            this.page = 1;
+            this.getGoodsList();
           },
           showFilterPop() {
             this.overFlag = true;
